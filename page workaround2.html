@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Autoplay with Sound</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+        }
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+        #initialOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .start-button {
+            padding: 15px 30px;
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .start-button:hover {
+            background-color: #ff6a33;
+        }
+    </style>
+</head>
+<body>
+    <div id="initialOverlay">
+        <button class="start-button">Click to play video with sound</button>
+    </div>
+    
+    <video id="myVideo" controls controlsList="nodownload" disablePictureInPicture>
+        <source src="https://s3.ap-southeast-2.amazonaws.com/australia.avatars/zoho/1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('myVideo');
+            const overlay = document.getElementById('initialOverlay');
+            const startButton = overlay.querySelector('.start-button');
+            
+            // Disable right-click menu on video
+            video.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Function to start video with sound
+            function startVideoWithSound() {
+                video.muted = false;
+                video.play().then(() => {
+                    // If successfully started
+                    overlay.style.display = 'none';
+                }).catch(e => {
+                    console.error("Failed to play video with sound:", e);
+                    // Can add additional error handling
+                });
+            }
+            
+            // Button click handler
+            startButton.addEventListener('click', startVideoWithSound);
+            
+            // Alternative way - start on overlay click
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    startVideoWithSound();
+                }
+            });
+            
+            // Also try to start on scroll event
+            document.addEventListener('scroll', function handler() {
+                startVideoWithSound();
+                document.removeEventListener('scroll', handler);
+            }, { once: true });
+            
+            // Or on key press
+            document.addEventListener('keydown', function handler() {
+                startVideoWithSound();
+                document.removeEventListener('keydown', handler);
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
